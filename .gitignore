@@ -1,3 +1,4 @@
-bin/
-obj/
+#eclude the bin and object files
+bin/**
+obj/**
 
