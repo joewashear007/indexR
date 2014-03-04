@@ -106,10 +106,15 @@ void SafeHashTable::resize(){
     num_elemets= 0;
     table_size = new_size;
 
+    SafeBucket* temp_holder;
+    SafeBucket* temp_link_holder;
     for( auto it = old_buckets->begin(); it != old_buckets->end(); ++it ){
-        if ( (*it) != nullptr ){
-            insert( (*it)->getWord() );
-            delete (*it);
+        temp_holder = (*it);
+        while(temp_holder != nullptr){
+            temp_link_holder = temp_holder->getLink();
+            temp_holder->setLink(nullptr);
+            insert(temp_holder);
+            temp_holder = temp_link_holder;
         }
     }
     delete old_buckets;
