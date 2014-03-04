@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <list>
 #include "SafeHashTable.h"
 
 using namespace std;
@@ -26,7 +27,7 @@ int main()
 ////        cout << bytes << endl;
     }
 
-//
+
 //    table->insert("Hel!lo");
 //    table->addLocation("Hel!lo", 34);
 //    table->addLocation("Hello", 356);
@@ -39,9 +40,28 @@ int main()
 //    table->insert("glass-");
 //    table->insert("how.");
 //    table->insert("joe.");
+//    table->insert("coffee");
+//    table->addLocation("coffee", 345);
+//    table->insert("bean");
+//    table->addLocation("bean", 345);
+//    table->insert("camel");
+//    table->addLocation("camel", 345);
+//    table->insert("cheese");
+//    table->addLocation("cheese", 345);
 
     cout << "\n\n\n========================= Final Table ===========\n";
-    table->print();
+    list<string>* keys = table->getKeys();
+    keys->sort();
+    int nulls = 0;
+
+    for( auto it = keys->begin(); it != keys->end(); ++ it){
+        table->get(*it)->print();
+    }
+    //table->print();
+    cout << "----- NUlls: " << nulls << endl;
+    cout << "Tabke Size " << table->size() << endl;
+    cout << "Number of Keys: " << keys->size() << "vs Number of Elements:" << table->count() << endl;
+
    // cout << "Ratio:" << (table->num_elemets / (double) table->table_size);
     return 0;
 }

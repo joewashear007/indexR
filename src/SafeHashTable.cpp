@@ -2,7 +2,7 @@
 
 SafeHashTable::SafeHashTable(){
     //buckets = new vector<SafeBucket*>();
-    this->prime_cnt = 1;
+    this->prime_cnt = -1;
     this->fill_ratio = 0.75;
     this->num_elemets = 0;
     this->table_size = NextCubanPrime();
@@ -35,28 +35,30 @@ void SafeHashTable::insert(SafeBucket* bucket){
     checkTableSize();
 
 }
-//
-//SafeBucket* SafeHashTable::get(string w){
-//    SafeBucket* temp_bucket = new SafeBucket(w);
-//    SafeBucket* result = nullptr;
-//
-//    int loc = temp_bucket->hash() % table_size;
-//
-//    if(buckets->at(loc) != nullptr ){
-//        if( buckets->at(loc)->getWord() == temp_bucket->getWord() ){
-//            result = buckets->at(loc);
-//        }else if{
-//            SafeBucket* link = temp_bucketbuckets->at(loc)->getLink();
-//            while( (link!= nullptr) && (result != nullptr) ){
-//                if( link->getWord() == temp_bucket->getWord())
-//                    result = link;
-//                link = link->getLink();
-//            }
-//        }
-//    }
-//    delete temp_bucket;
-//	return result;
-//}
+
+SafeBucket* SafeHashTable::get(string w){
+    SafeBucket* temp_bucket = new SafeBucket(w);
+    SafeBucket* result = nullptr;
+
+    int loc = temp_bucket->hash() % table_size;
+
+    if(buckets->at(loc) != nullptr ){
+        if( buckets->at(loc)->getWord() == temp_bucket->getWord() ){
+            result = buckets->at(loc);
+        }else{
+            SafeBucket* link = buckets->at(loc)->getLink();
+            while( (link!= nullptr) ){
+                if( link->getWord() == temp_bucket->getWord()){
+                    result = link;
+                    break;
+                }
+                link = link->getLink();
+            }
+        }
+    }
+    delete temp_bucket;
+	return result;
+}
 
 bool SafeHashTable::contains(string w){
     SafeBucket* bucket = new SafeBucket(w);
@@ -126,22 +128,27 @@ int SafeHashTable::NextCubanPrime(){
     return (3*prime_cnt*prime_cnt) + (3*prime_cnt) + 1;
 }
 
+int SafeHashTable::count(){
+    return num_elemets;
+}
+
+int SafeHashTable::size(){
+    return table_size;
+}
+
 void SafeHashTable::addLocation(string w, long offset){
     SafeBucket* temp_bucket = new SafeBucket(w);
 
     int loc = temp_bucket->hash() % table_size;
-    bool found = false;
 
     if(buckets->at(loc) != nullptr ){
         if( buckets->at(loc)->getWord() == temp_bucket->getWord()){
             buckets->at(loc)->addLocation(offset);
-            found = true;
         }else{
             SafeBucket* link = buckets->at(loc)->getLink();
             while( (link!= nullptr) ){
                 if( link->getWord() == temp_bucket->getWord()){
                     buckets->at(loc)->addLocation(offset);
-                    found = true;
                     break;
                 }
                 link = link->getLink();
@@ -172,3 +179,14 @@ void SafeHashTable::print(){
     }
 }
 
+list<string>* SafeHashTable::getKeys(){
+    list<string>* keys = new list<string>();
+    for(auto it = buckets->begin(); it != buckets->end(); ++it){
+        SafeBucket* item = (*it);
+        while(item != nullptr){
+            keys->push_back(item->getWord());
+            item = item->getLink();
+        }
+    }
+    return keys;
+}

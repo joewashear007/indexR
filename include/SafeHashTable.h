@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <list>
 #include "SafeBucket.h"
 
 using namespace std;
@@ -23,6 +24,10 @@ class SafeHashTable
         bool contains(string w);
         void addLocation(string w, long offset);
         SafeBucket* get(string w);
+
+        list<string>* getKeys();
+        int count();
+        int size();
     private:
         int prime_cnt;
         int num_elemets;

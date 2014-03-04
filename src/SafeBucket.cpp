@@ -66,11 +66,8 @@ void SafeBucket::addLocation(long i){
 
 void SafeBucket::print(){
     cout << this->word << " (" << locations.size() << ")- " ;
-    //const char* const delim = ", ";
-    //std::ostringstream imploded;
     for ( auto it = locations.begin(); it != locations.end(); ++it){
         cout << (*it) << ", ";
     }
-    //copy(locations.begin(), locations.end(), ostream_iterator<int>(imploded, delim));
-    //<< imploded.rdbuf();
+    cout << endl;
 }
