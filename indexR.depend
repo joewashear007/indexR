@@ -1,0 +1,27 @@
+# depslib dependency file v1.0
+1393960145 source:/home/joewashere/Dropbox/Programing/C++/indexR/main.cpp
+	<iostream>
+	<fstream>
+	<string>
+	"SafeHashTable.h"
+
+1393959923 source:/home/joewashere/Dropbox/Programing/C++/indexR/src/SafeBucket.cpp
+	"SafeBucket.h"
+
+1393951239 /home/joewashere/Dropbox/Programing/C++/indexR/include/SafeBucket.h
+	<sstream>
+	<iostream>
+	<string>
+	<algorithm>
+	<vector>
+	<iterator>
+
+1393960281 /home/joewashere/Dropbox/Programing/C++/indexR/include/SafeHashTable.h
+	<iostream>
+	<vector>
+	<algorithm>
+	"SafeBucket.h"
+
+1393960273 source:/home/joewashere/Dropbox/Programing/C++/indexR/src/SafeHashTable.cpp
+	"SafeHashTable.h"
+
