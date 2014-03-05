@@ -3,7 +3,7 @@
 SafeHashTable::SafeHashTable(){
     //buckets = new vector<SafeBucket*>();
     this->prime_cnt = -1;
-    this->fill_ratio = 0.75;
+    this->fill_ratio = 0.95;
     this->num_elemets = 0;
     this->table_size = NextCubanPrime();
     this->buckets = new vector<SafeBucket*>(table_size, nullptr);
@@ -148,7 +148,7 @@ void SafeHashTable::addLocation(string w, long offset){
             SafeBucket* link = buckets->at(loc)->getLink();
             while( (link!= nullptr) ){
                 if( link->getWord() == temp_bucket->getWord()){
-                    buckets->at(loc)->addLocation(offset);
+                    link->addLocation(offset);
                     break;
                 }
                 link = link->getLink();
