@@ -10,7 +10,7 @@ using namespace std;
 
 void AddStuff1(SafeHashTable* table){
     table->insert("Hel!lo");
-    table->addLocation("Hel!lo", 1);
+    table->addLocation("Hello", 1);
     table->addLocation("Hello", 2);
     table->addLocation("hello", 3);
 
@@ -35,19 +35,20 @@ void AddStuff2(SafeHashTable* table){
     table->insert("how.");
     table->insert("joe.");
     table->insert("coffee");
-    table->addLocation("coffee", 20);
+//    table->addLocation("coffee", 20);
     table->insert("bean");
-    table->addLocation("bean", 30);
+//    table->addLocation("bean", 30);
     table->insert("camel");
-    table->addLocation("camel", 40);
+//    table->addLocation("camel", 40);
     table->insert("cheese");
-    table->addLocation("cheese", 50);
+//    table->addLocation("cheese", 50);
 }
 
 int main()
 {
-    cout << "Hello world!" << endl;
+
     SafeHashTable* table = new SafeHashTable();
+    cout << "Hello world!" << endl;
 //    ifstream file;
 //    file.open ("/home/joewashere/pp.txt");
 //
@@ -85,9 +86,9 @@ int main()
     keys->sort();
 
     for( auto it = keys->begin(); it != keys->end(); ++ it){
-    //    table->get(*it)->print();
+        table->get(*it)->print();
     }
-    table->print();
+    //table->print();
     cout << "Table Size " << table->size() << endl;
     cout << "Number of Keys: " << keys->size() << "vs Number of Elements:" << table->count() << endl;
 

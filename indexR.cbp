@@ -35,6 +35,9 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add library="pthread" />
+		</Linker>
 		<Unit filename="include/SafeBucket.h" />
 		<Unit filename="include/SafeHashTable.h" />
 		<Unit filename="main.cpp" />

@@ -35,6 +35,7 @@ class SafeBucket
         string word;
         SafeBucket* link;
         vector<long> locations;
+        mutex mtx;
 };
 
 

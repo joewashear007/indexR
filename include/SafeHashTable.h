@@ -5,6 +5,8 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include <mutex>
+#include <pthread.h>
 #include "SafeBucket.h"
 
 using namespace std;
@@ -33,6 +35,7 @@ class SafeHashTable
         int num_elemets;
         int table_size;
         double fill_ratio;
+        pthread_rwlock_t table_lock;
 
         vector<SafeBucket*>* buckets;
 

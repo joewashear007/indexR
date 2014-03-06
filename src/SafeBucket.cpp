@@ -18,21 +18,10 @@ SafeBucket::~SafeBucket(){
     }
 }
 
+/* -------------------------- Get Methods --------------- */
+
 SafeBucket* SafeBucket::getLink(){
     return link;
-}
-
-void SafeBucket::setLink(SafeBucket* link){
-    this->link = link;
-}
-
-void SafeBucket::setWord(string w){
-    string::iterator s_begin = w.begin();
-    string::iterator s_end = w.end();
-    transform(s_begin, s_end, s_begin, ::tolower);
-    string::iterator newEnd =  std::remove_if(s_begin, s_end, isSpecialChar);
-    string result(s_begin, newEnd);
-    this->word = result;
 }
 
 string SafeBucket::getWord(){
@@ -42,7 +31,6 @@ string SafeBucket::getWord(){
 bool SafeBucket::isSpecialChar(char c){
     return !isalnum(c);
 }
-
 
 int SafeBucket::hash(){
     char alpha;
@@ -60,14 +48,35 @@ int SafeBucket::hash(){
     return hashSum;
 }
 
-void SafeBucket::addLocation(long i){
-    this->locations.push_back(i);
-}
-
 void SafeBucket::print(){
     cout << this->word << " (" << locations.size() << ")- " ;
     for ( auto it = locations.begin(); it != locations.end(); ++it){
         cout << (*it) << ", ";
     }
     cout << endl;
+}
+
+/* ---------------- Set Methods that require a lock ------------ */
+
+void SafeBucket::setLink(SafeBucket* link){
+    mtx.lock();
+    this->link = link;
+    mtx.unlock();
+}
+
+void SafeBucket::addLocation(long i){
+    mtx.lock();
+    this->locations.push_back(i);
+    mtx.unlock();
+}
+
+void SafeBucket::setWord(string w){
+    mtx.lock();
+    string::iterator s_begin = w.begin();
+    string::iterator s_end = w.end();
+    transform(s_begin, s_end, s_begin, ::tolower);
+    string::iterator newEnd =  std::remove_if(s_begin, s_end, isSpecialChar);
+    string result(s_begin, newEnd);
+    this->word = result;
+    mtx.unlock();
 }
