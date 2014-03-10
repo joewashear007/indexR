@@ -53,7 +53,7 @@ void ReadFileChunk(SafeHashTable* table,  string filename, long start, long leng
             cout << "\nReading: " << word;
             if(!table->contains(word))
                 table->insert(word);
-            table->addLocation(word, word_position);
+            table->get(word)->addLocation(word_position);
             if ( ( file.tellg() > (start + lenght)) ){
                 readNext = false;
             }

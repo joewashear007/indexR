@@ -12,8 +12,9 @@ SafeHashTable::SafeHashTable(){
 
 SafeHashTable::~SafeHashTable(){
     pthread_rwlock_destroy(&table_lock);
-    //delete buckets;
-    //to do: delete elements
+    for (auto it=buckets->begin(); it!=buckets->end(); ++it){
+        delete (*it);
+    }
 }
 
 /* --------- Read Methods --------- */
@@ -22,7 +23,7 @@ SafeBucket* SafeHashTable::get(string w){
     SafeBucket* temp_bucket = new SafeBucket(w);
     SafeBucket* result = nullptr;
 
-    pthread_rwlock_rdlock(&table_lock);
+    int rc = pthread_rwlock_rdlock(&table_lock);
     int loc = temp_bucket->hash() % table_size;
     if(buckets->at(loc) != nullptr ){
         if( buckets->at(loc)->getWord() == temp_bucket->getWord() ){
@@ -38,16 +39,16 @@ SafeBucket* SafeHashTable::get(string w){
             }
         }
     }
-    pthread_rwlock_unlock(&table_lock);
+    rc = pthread_rwlock_unlock(&table_lock);
     delete temp_bucket;
 	return result;
 }
 
 bool SafeHashTable::contains(string w){
-    pthread_rwlock_rdlock(&table_lock);
     SafeBucket* bucket = new SafeBucket(w);
-    int loc = bucket->hash() % table_size;
     bool found = false;
+    int rc = pthread_rwlock_rdlock(&table_lock);
+    int loc = bucket->hash() % table_size;
 
     if(buckets->at(loc) == nullptr){
         found = false;
@@ -62,6 +63,7 @@ bool SafeHashTable::contains(string w){
         }
     }
     pthread_rwlock_unlock(&table_lock);
+    delete bucket;
 	return found;
 }
 
@@ -119,8 +121,8 @@ void SafeHashTable::print(){
 }
 
 list<string>* SafeHashTable::getKeys(){
-    pthread_rwlock_rdlock(&table_lock);
     list<string>* keys = new list<string>();
+    pthread_rwlock_rdlock(&table_lock);
     for(auto it = buckets->begin(); it != buckets->end(); ++it){
         SafeBucket* item = (*it);
         while(item != nullptr){
@@ -135,13 +137,25 @@ list<string>* SafeHashTable::getKeys(){
 /* -------------- Write Methods -------------- */
 
 void SafeHashTable::insert(string w){
+    int rc = pthread_rwlock_wrlock(&table_lock);
+    int count = 0;
+    while (rc == EBUSY) {
+        if (count >= 10) {
+            printf("Retried too many times, failure!\n");
+            exit(EXIT_FAILURE);
+        }
+        ++count;
+        printf("Could not get lock, do other work, then RETRY...\n");
+        sleep(1);
+    }
     insert(new SafeBucket(w));
+
+    rc = pthread_rwlock_unlock(&table_lock);
+    checkTableSize();
 }
 
 void SafeHashTable::insert(SafeBucket* bucket){
-    pthread_rwlock_wrlock(&table_lock);
     int loc = bucket->hash() % table_size;
-
     if( buckets->at(loc) == nullptr){
         buckets->at(loc) = bucket;
     }else{
@@ -151,38 +165,46 @@ void SafeHashTable::insert(SafeBucket* bucket){
         }
         link_element->setLink(bucket);
     }
-    //cout << "Inserted @ : " << loc << endl;
     this->num_elemets++;
-    pthread_rwlock_unlock(&table_lock);
-    checkTableSize();
 }
 
-void SafeHashTable::addLocation(string w, long offset){
-    pthread_rwlock_wrlock(&table_lock);
-    SafeBucket* temp_bucket = new SafeBucket(w);
-
-    int loc = temp_bucket->hash() % table_size;
-
-    if(buckets->at(loc) != nullptr ){
-        if( buckets->at(loc)->getWord() == temp_bucket->getWord()){
-            buckets->at(loc)->addLocation(offset);
-        }else{
-            SafeBucket* link = buckets->at(loc)->getLink();
-            while( (link!= nullptr) ){
-                if( link->getWord() == temp_bucket->getWord()){
-                    link->addLocation(offset);
-                    break;
-                }
-                link = link->getLink();
-            }
-        }
-    }
-    pthread_rwlock_unlock(&table_lock);
-    delete temp_bucket;
-}
+//void SafeHashTable::addLocation(string w, long offset){
+//    pthread_rwlock_wrlock(&table_lock);
+//    SafeBucket* temp_bucket = new SafeBucket(w);
+//
+//    int loc = temp_bucket->hash() % table_size;
+//
+//    if(buckets->at(loc) != nullptr ){
+//        if( buckets->at(loc)->getWord() == temp_bucket->getWord()){
+//            buckets->at(loc)->addLocation(offset);
+//        }else{
+//            SafeBucket* link = buckets->at(loc)->getLink();
+//            while( (link!= nullptr) ){
+//                if( link->getWord() == temp_bucket->getWord()){
+//                    link->addLocation(offset);
+//                    break;
+//                }
+//                link = link->getLink();
+//            }
+//        }
+//    }
+//    pthread_rwlock_unlock(&table_lock);
+//    delete temp_bucket;
+//}
 
 void SafeHashTable::resize(){
-    pthread_rwlock_wrlock(&table_lock);
+    int rc = pthread_rwlock_wrlock(&table_lock);
+    int count = 0;
+    while (rc == EBUSY) {
+        if (count >= 10) {
+            printf("Retried too many times, failure!\n");
+            exit(EXIT_FAILURE);
+        }
+        ++count;
+        printf("Could not get lock, do other work, then RETRY...\n");
+        sleep(1);
+    }
+
     int new_size = NextCubanPrime();
     cout << "=====================================================\n";
     cout << "Resizing!!! New Table size: " << new_size << endl;
@@ -208,6 +230,6 @@ void SafeHashTable::resize(){
             temp_holder = temp_link_holder;
         }
     }
-    pthread_rwlock_unlock(&table_lock);
+    rc = pthread_rwlock_unlock(&table_lock);
     delete old_buckets;
 }

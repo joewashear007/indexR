@@ -7,6 +7,7 @@
 #include <list>
 #include <mutex>
 #include <pthread.h>
+#include <unistd.h>
 #include "SafeBucket.h"
 
 using namespace std;
@@ -18,9 +19,9 @@ class SafeHashTable
 
         SafeHashTable();
         virtual ~SafeHashTable();
-
-        void insert(SafeBucket* bucket);
         void insert(string w);
+
+
         void print();
 
         bool contains(string w);
@@ -40,6 +41,7 @@ class SafeHashTable
 
         vector<SafeBucket*>* buckets;
 
+        void insert(SafeBucket* bucket);
         void resize();
         void checkTableSize();
 };
