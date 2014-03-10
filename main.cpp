@@ -5,83 +5,122 @@
 #include "SafeHashTable.h"
 #include <thread>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 using namespace std;
 
-
-void AddStuff1(SafeHashTable* table){
-    table->insert("Hel!lo");
-    table->addLocation("Hello", 1);
-    table->addLocation("Hello", 2);
-    table->addLocation("hello", 3);
-
-    table->insert("tabl@e");
-    table->insert("book.");
-    table->insert("greeting ");
-    table->insert(">kenya");
-    table->insert("cup,");
-    table->insert("glass-");
-    table->insert("rocks");
-    table->insert("socks");
-    //table->insert("clocks");
+void printCommandLineError(){
+    cout << "indexR: invaild options!" << endl;
+    cout << "Try 'indexR --help' more options" << endl;
 }
 
-void AddStuff2(SafeHashTable* table){
-    //table->insert("twigs");
-    table->insert("jigs");
-    table->addLocation("hello", 4);
-    table->addLocation("hello", 5);
-    table->addLocation("hello", 6);
-    table->insert("figs");
-    table->insert("how.");
-    table->insert("joe.");
-    table->insert("coffee");
-//    table->addLocation("coffee", 20);
-    table->insert("bean");
-//    table->addLocation("bean", 30);
-    table->insert("camel");
-//    table->addLocation("camel", 40);
-    table->insert("cheese");
-//    table->addLocation("cheese", 50);
+void printHelp(){
+    cout << "indexR is a word frequency program" << endl;
+    cout << "it will print out a sorted list of all the words in a document and there location in bytes" << endl;
+    cout << endl;
+    cout << "Usage:\n ./Project1 filename\n ./Project1 -f filename -t thread_count"
+ << endl;
 }
 
-int main()
-{
+int getFileInfo(string filename, int thread_cnt){
+    struct stat fileinfo;
+    lstat(filename.c_str(), &fileinfo);
+    long bytes = fileinfo.st_size;
+    long bytes_to_read = bytes / thread_cnt;
+    cout << "The file is " << bytes << " bytes long\n";
+    cout << "Running " << thread_cnt << " threads, each thread will read " << bytes_to_read << endl;
+    return bytes_to_read;
+}
 
+void ReadFileChunk(SafeHashTable* table,  string filename, long start, long lenght){
+    ifstream file (filename, ios_base::in);
+    string word;
+
+    if(start > 1 ){
+        file.seekg(start);
+        if ( file.peek() != ' ' ){
+            file >> word;
+        }
+    }
+
+    bool readNext = true;
+    while(readNext){
+        long word_position = file.tellg();
+        file >> word;
+        if( file.good() ){
+            cout << "\nReading: " << word;
+            if(!table->contains(word))
+                table->insert(word);
+            table->addLocation(word, word_position);
+            if ( ( file.tellg() > (start + lenght)) ){
+                readNext = false;
+            }
+        }else{
+            readNext = false;
+        }
+
+    }
+}
+
+int main(int argc, char* argv[]){
+    string filename;
+    int thread_cnt = 4;
+
+    //---- Parse Arguments -----------------
+    if(argc == 2){
+        //args form: ./indexR file
+        string arg = argv[1];
+        if( arg == "--help"){
+            printHelp();
+            exit(EXIT_SUCCESS);
+        }else{
+            filename = arg;
+        }
+    }else if(argc == 5){
+        // arg form: ./Project1 -f filename -t thread_count
+        for(int i=1; i < argc; i++) {
+            string arg(argv[i]);
+            if (i + 1 != argc) {
+                if (arg == "-f") {
+                    filename = argv[i + 1];
+                    i++;
+                } else if (arg == "-t") {
+                    thread_cnt = atoi(argv[i + 1]);
+                    i++;
+                } else if( (i+1) == argc ){
+                    filename = argv[i];
+                } else {
+                    printCommandLineError();
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+    }else{
+        // bad arg form
+        printCommandLineError();
+        exit(EXIT_FAILURE);
+    }
+
+    //---------------- Main Progam ------------
+    //int thread_cnt = 4;
+    //string filename = "/home/joewashere/words.txt";
     SafeHashTable* table = new SafeHashTable();
-    cout << "Hello world!" << endl;
-//    ifstream file;
-//    file.open ("/home/joewashere/pp.txt");
-//
-//    string word;
-//    long bytes = 0;
-//    while (!file.eof())
-//    {
-//        long word_position = file.tellg();
-//        file >> word;
-//        if(!table->contains(word))
-//            table->insert(word);
-//        table->addLocation(word, word_position);
-////        cout << word << " = " << sizeof(word) << " @ " << file.tellg() << endl;
-////        bytes = file.tellp();
-//////        cout << bytes << endl;
-//    }
+    cout << "Reading file: " << filename << endl;
 
-//
-    cout << "Starting Treads!" << endl;
-    thread first (AddStuff1, table);
-    thread second (AddStuff2, table);
+    int bytes = getFileInfo(filename, thread_cnt);
 
+    vector<thread*> threads;
+    for(int i=0; i<thread_cnt ;i++){
+        long start = i * bytes;
+        threads.push_back(new thread (ReadFileChunk, table, filename, start, bytes) );
+    }
+    for (auto it=threads.begin(); it!=threads.end(); ++it){
+        (*it)->join();
+    }
 
-    first.join();
-
-
-    second.join();
-
-
-//    AddStuff1(table);
-//    AddStuff2(table);
-
-    cout << "\n\n\n========================= Final Table ===========\n";
+    cout << "\n\n========================= Final Table ===========\n";
     list<string>* keys = table->getKeys();
     keys->sort();
 
@@ -89,7 +128,7 @@ int main()
         table->get(*it)->print();
     }
     //table->print();
-    cout << "Table Size " << table->size() << endl;
+    cout << "Table Size " << table->size() << ": " << table->ratio() << endl;
     cout << "Number of Keys: " << keys->size() << "vs Number of Elements:" << table->count() << endl;
 
     return 0;

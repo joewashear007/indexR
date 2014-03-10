@@ -3,7 +3,7 @@
 SafeHashTable::SafeHashTable(){
     //buckets = new vector<SafeBucket*>();
     this->prime_cnt = -1;
-    this->fill_ratio = 0.95;
+    this->fill_ratio = 0.75;
     this->num_elemets = 0;
     this->table_size = NextCubanPrime();
     this->buckets = new vector<SafeBucket*>(table_size, nullptr);
@@ -74,7 +74,7 @@ void SafeHashTable::checkTableSize(){
 }
 
 int SafeHashTable::NextCubanPrime(){
-    //3y2 + 3y + 1 // Cuban Prime numbers
+    //Cuban Prime numbers: 3y2 + 3y + 1
     prime_cnt += 3;
     return (3*prime_cnt*prime_cnt) + (3*prime_cnt) + 1;
 }
@@ -88,6 +88,12 @@ int SafeHashTable::count(){
 int SafeHashTable::size(){
     pthread_rwlock_rdlock(&table_lock);
     return table_size;
+    pthread_rwlock_unlock(&table_lock);
+}
+
+double SafeHashTable::ratio(){
+    pthread_rwlock_rdlock(&table_lock);
+    return this->num_elemets / (double) table_size;
     pthread_rwlock_unlock(&table_lock);
 }
 

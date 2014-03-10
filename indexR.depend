@@ -1,13 +1,16 @@
 # depslib dependency file v1.0
-1394147367 source:/home/joewashere/Dropbox/Programing/C++/indexR/main.cpp
+1394419011 source:/home/joewashere/Dropbox/Programing/C++/indexR/main.cpp
 	<iostream>
 	<fstream>
 	<string>
 	<list>
 	"SafeHashTable.h"
 	<thread>
+	<sys/types.h>
+	<sys/stat.h>
+	<unistd.h>
 
-1394047828 source:/home/joewashere/Dropbox/Programing/C++/indexR/src/SafeBucket.cpp
+1394386346 source:/home/joewashere/Dropbox/Programing/C++/indexR/src/SafeBucket.cpp
 	"SafeBucket.h"
 
 1394047178 /home/joewashere/Dropbox/Programing/C++/indexR/include/SafeBucket.h
@@ -19,7 +22,7 @@
 	<iterator>
 	<mutex>
 
-1394147811 /home/joewashere/Dropbox/Programing/C++/indexR/include/SafeHashTable.h
+1394419020 /home/joewashere/Dropbox/Programing/C++/indexR/include/SafeHashTable.h
 	<iostream>
 	<vector>
 	<algorithm>
@@ -28,6 +31,6 @@
 	<pthread.h>
 	"SafeBucket.h"
 
-1394147327 source:/home/joewashere/Dropbox/Programing/C++/indexR/src/SafeHashTable.cpp
+1394419149 source:/home/joewashere/Dropbox/Programing/C++/indexR/src/SafeHashTable.cpp
 	"SafeHashTable.h"
 

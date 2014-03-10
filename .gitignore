@@ -1,4 +1,5 @@
 #eclude the bin and object files
 bin/**
 obj/**
+*.0
 

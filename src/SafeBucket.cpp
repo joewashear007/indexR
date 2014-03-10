@@ -50,6 +50,7 @@ int SafeBucket::hash(){
 
 void SafeBucket::print(){
     cout << this->word << " (" << locations.size() << ")- " ;
+    sort(locations.begin(), locations.end() );
     for ( auto it = locations.begin(); it != locations.end(); ++it){
         cout << (*it) << ", ";
     }

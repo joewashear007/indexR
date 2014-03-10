@@ -30,6 +30,7 @@ class SafeHashTable
         list<string>* getKeys();
         int count();
         int size();
+        double ratio();
     private:
         int prime_cnt;
         int num_elemets;
