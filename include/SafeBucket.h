@@ -1,3 +1,11 @@
+/*
+* Project2 - indexR
+* EECS 3540 - Project 2
+* Jospeh Livecchi
+* Bucket Source - A thread safe bucket for a word and list of offsets.
+        Also has a linked list for collisions
+*/
+
 #ifndef SAFEBUCKET_H
 #define SAFEBUCKET_H
 #include <sstream>

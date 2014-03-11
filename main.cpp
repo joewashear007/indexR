@@ -1,3 +1,10 @@
+/*
+* Project2 - indexR
+* EECS 3540 - Project 2
+* Jospeh Livecchi
+* Main Programs - handles cmd line args, spliting given file, starting threads, and printing out
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -30,7 +37,7 @@ int getFileInfo(string filename, int thread_cnt){
     long bytes = fileinfo.st_size;
     long bytes_to_read = bytes / thread_cnt;
     cout << "The file is " << bytes << " bytes long\n";
-    cout << "Running " << thread_cnt << " threads, each thread will read " << bytes_to_read << endl;
+    cout << "Running " << thread_cnt << " threads, each thread will read " << bytes_to_read << endl << endl << endl;
     return bytes_to_read;
 }
 
@@ -50,8 +57,7 @@ void ReadFileChunk(SafeHashTable* table,  string filename, long start, long leng
         long word_position = file.tellg();
         file >> word;
         if( file.good() ){
-            cout << "\nReading: " << word;
-            if(!table->contains(word))
+             if(!table->contains(word))
                 table->insert(word);
             table->get(word)->addLocation(word_position);
             if ( ( file.tellg() > (start + lenght)) ){
@@ -104,10 +110,8 @@ int main(int argc, char* argv[]){
     }
 
     //---------------- Main Progam ------------
-    //int thread_cnt = 4;
-    //string filename = "/home/joewashere/words.txt";
     SafeHashTable* table = new SafeHashTable();
-    cout << "Reading file: " << filename << endl;
+    cout << "\nReading file: " << filename << endl;
 
     int bytes = getFileInfo(filename, thread_cnt);
 
@@ -120,16 +124,15 @@ int main(int argc, char* argv[]){
         (*it)->join();
     }
 
-    cout << "\n\n========================= Final Table ===========\n";
+    // ---------- Print out the result --------------------
     list<string>* keys = table->getKeys();
     keys->sort();
 
     for( auto it = keys->begin(); it != keys->end(); ++ it){
         table->get(*it)->print();
     }
-    //table->print();
-    cout << "Table Size " << table->size() << ": " << table->ratio() << endl;
-    cout << "Number of Keys: " << keys->size() << "vs Number of Elements:" << table->count() << endl;
+    cout << "\n\nTable Size " << table->size() << ": " << table->ratio() << endl;
+    cout << "Numnber of Elements: " << table->count() << endl << endl;
 
     return 0;
 }

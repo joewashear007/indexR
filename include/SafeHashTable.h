@@ -1,3 +1,11 @@
+/*
+* Project2 - indexR
+* EECS 3540 - Project 2
+* Jospeh Livecchi
+* Hash Table Source - A thread safe hash table with read/write locks.
+        dynamical resizes, collisions are handled by linked list
+*/
+
 #ifndef SAFEHASHTABLE_H
 #define SAFEHASHTABLE_H
 

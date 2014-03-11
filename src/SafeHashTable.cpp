@@ -1,3 +1,11 @@
+/*
+* Project2 - indexR
+* EECS 3540 - Project 2
+* Jospeh Livecchi
+* Hash Table Source - A thread safe hash table with read/write locks.
+        dynamical resizes, collisions are handled by linked list
+*/
+
 #include "SafeHashTable.h"
 
 SafeHashTable::SafeHashTable(){
@@ -70,7 +78,7 @@ bool SafeHashTable::contains(string w){
 void SafeHashTable::checkTableSize(){
     double cur_ratio = this->num_elemets / (double) table_size;
     if(cur_ratio > this->fill_ratio){
-        cout << "The table needs to be resized! " << cur_ratio << ":" << this->fill_ratio << endl;
+ //       cout << "The table needs to be resized! " << cur_ratio << ":" << this->fill_ratio << endl;
         resize();
     }
 }
@@ -138,18 +146,7 @@ list<string>* SafeHashTable::getKeys(){
 
 void SafeHashTable::insert(string w){
     int rc = pthread_rwlock_wrlock(&table_lock);
-    int count = 0;
-    while (rc == EBUSY) {
-        if (count >= 10) {
-            printf("Retried too many times, failure!\n");
-            exit(EXIT_FAILURE);
-        }
-        ++count;
-        printf("Could not get lock, do other work, then RETRY...\n");
-        sleep(1);
-    }
     insert(new SafeBucket(w));
-
     rc = pthread_rwlock_unlock(&table_lock);
     checkTableSize();
 }
@@ -168,53 +165,18 @@ void SafeHashTable::insert(SafeBucket* bucket){
     this->num_elemets++;
 }
 
-//void SafeHashTable::addLocation(string w, long offset){
-//    pthread_rwlock_wrlock(&table_lock);
-//    SafeBucket* temp_bucket = new SafeBucket(w);
-//
-//    int loc = temp_bucket->hash() % table_size;
-//
-//    if(buckets->at(loc) != nullptr ){
-//        if( buckets->at(loc)->getWord() == temp_bucket->getWord()){
-//            buckets->at(loc)->addLocation(offset);
-//        }else{
-//            SafeBucket* link = buckets->at(loc)->getLink();
-//            while( (link!= nullptr) ){
-//                if( link->getWord() == temp_bucket->getWord()){
-//                    link->addLocation(offset);
-//                    break;
-//                }
-//                link = link->getLink();
-//            }
-//        }
-//    }
-//    pthread_rwlock_unlock(&table_lock);
-//    delete temp_bucket;
-//}
-
 void SafeHashTable::resize(){
     int rc = pthread_rwlock_wrlock(&table_lock);
-    int count = 0;
-    while (rc == EBUSY) {
-        if (count >= 10) {
-            printf("Retried too many times, failure!\n");
-            exit(EXIT_FAILURE);
-        }
-        ++count;
-        printf("Could not get lock, do other work, then RETRY...\n");
-        sleep(1);
-    }
-
     int new_size = NextCubanPrime();
-    cout << "=====================================================\n";
-    cout << "Resizing!!! New Table size: " << new_size << endl;
-    cout << "Old Table Data: " << buckets->size() << " Cap: "<< buckets->capacity() << endl;
+//    cout << "=====================================================\n";
+//    cout << "Resizing!!! New Table size: " << new_size << endl;
+//    cout << "Old Table Data: " << buckets->size() << " Cap: "<< buckets->capacity() << endl;
 
     vector<SafeBucket*>* old_buckets = buckets;
     this->buckets = new vector<SafeBucket*>(new_size, nullptr);
 
-    cout << "New Table Data: " << buckets->size() << " Cap: "<< buckets->capacity() << endl;
-    cout << "=====================================================\n";
+//    cout << "New Table Data: " << buckets->size() << " Cap: "<< buckets->capacity() << endl;
+//    cout << "=====================================================\n";
 
     num_elemets= 0;
     table_size = new_size;
